@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -15,52 +18,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.sourcedevelopers.anagramrestful.domains.Dictionary;
-import com.sourcedevelopers.anagramrestful.domains.SIGNATURES;
 import com.sourcedevelopers.anagramrestful.domains.Word;
 
 @Service
 public class DictionaryFileServiceImpl implements DictionaryService {
 
+	protected final Log logger = LogFactory.getLog(getClass());
+
 	@Autowired
 	private Dictionary dictionary;
 	@Autowired
-	private SentenceService sentenceService;
+	BeanFactory beanFactory;
 
 	@Value("${dictionary.path}")
 	private String dictionaryPath;
 
+	/* (non-Javadoc)
+	 * @see com.sourcedevelopers.anagramrestful.services.DictionaryService#loadDictionary()
+	 */
 	@Override
 	@EventListener(ContextRefreshedEvent.class)
 	public void loadDictionary() throws Exception{
 		File file = ResourceUtils.getFile("classpath:" + dictionaryPath);
 		try (BufferedReader br = Files.newBufferedReader( Paths.get(file.getAbsolutePath()))) {
-			dictionary.setWords(br.lines().map(initializeWord).collect(Collectors.toList()));
+			dictionary.setWords(br.lines().filter(line -> line.length() > 2).map(initializeWord).collect(Collectors.toList()));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
 	Function<String, Word> initializeWord = (String line) -> {
-		Word word = new Word();
-		word.setWord(line);
-		String orderedLine = sentenceService.orderStringAlphabetically(line);
-		word.getWordLetters().put(SIGNATURES.WORD, orderedLine);
-		word.getWordLetters().put(SIGNATURES.SIMPLIFIED_WORD, sentenceService.removeDuplicates(orderedLine));
-		word.getWordLetters().put(SIGNATURES.VOWELS, sentenceService.extractVowels(orderedLine));
-		word.getWordLetters().put(SIGNATURES.CONSONANTS, sentenceService.extractConsonants(orderedLine));
+		Word word = beanFactory.getBean(Word.class);
+		word.setText(line);
 		return word;
 	};
 
-	/**
-	 * @return the dictionary
+	/* (non-Javadoc)
+	 * @see com.sourcedevelopers.anagramrestful.services.DictionaryService#getDictionary()
 	 */
 	@Override
 	public Dictionary getDictionary() {
 		return dictionary;
 	}
 
-	/**
-	 * @param dictionary the dictionary to set
+	/* (non-Javadoc)
+	 * @see com.sourcedevelopers.anagramrestful.services.DictionaryService#setDictionary(com.sourcedevelopers.anagramrestful.domains.Dictionary)
 	 */
 	@Override
 	public void setDictionary(Dictionary dictionary) {

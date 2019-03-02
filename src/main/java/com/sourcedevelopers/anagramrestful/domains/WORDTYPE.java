@@ -1,6 +1,6 @@
 package com.sourcedevelopers.anagramrestful.domains;
 
-public enum SIGNATURES {
+public enum WORDTYPE {
 
 	WORD,
 	SIMPLIFIED_WORD,

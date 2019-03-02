@@ -12,7 +12,6 @@ public class Dictionary {
 	@Autowired
 	List<Word> words;
 
-
 	/**
 	 * @return the dictionary
 	 */

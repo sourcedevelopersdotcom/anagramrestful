@@ -1,8 +1,9 @@
 package com.sourcedevelopers.anagramrestful.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,15 +16,13 @@ import com.sourcedevelopers.anagramrestful.services.AnagramService;
 @RequestMapping("/api")
 public class AnagramController {
 
-	private List<String> anagrams = new ArrayList<String>();
-
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
 	private AnagramService anagramService;
 
 	@PostMapping("/anagrams")
 	public List<String> createAnagrams(@RequestBody String phrase) {
-		anagrams = anagramService.getAnagrams(phrase);
-		return anagrams;
+		return anagramService.getAnagrams(phrase);
 	}
 }
