@@ -1,28 +1,29 @@
 package com.sourcedevelopers.anagramrestful.domains;
 
-import java.util.HashMap;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
+@Component
 public class Dictionary {
 
-	private enum SIGNATURES{VOCALS, CONSONANTS}
-
-	HashMap<String, HashMap<String, V>> words;
+	@Autowired
+	List<Word> words;
 
 	/**
-	 * @return the words
+	 * @return the dictionary
 	 */
-	public List<String> getWords() {
+	public List<Word> getWords() {
 		return words;
 	}
 
 	/**
-	 * @param words the words to set
+	 * @param dictionary the dictionary to set
 	 */
-	public void setWords(List<String> words) {
+	public void setWords(List<Word> words) {
 		this.words = words;
 	}
-
-
 
 }
